@@ -11,7 +11,8 @@ def play():#playerwindow):
         gameplay.attributes("-fullscreen",config.FULLSCREEN)
         canvas = Canvas(gameplay,width=2300,height=1300,bg="#15E058")
         canvas.pack()
-
+        SPEED = 10
+        
         # house 
         # canvas.create_rectangle(1500,445,1766,265,fill="#493333") #width = 533 height = 300
         # canvas.create_polygon(1500,455,2033,445,1283,545,fill="#493333") #
@@ -56,6 +57,27 @@ def play():#playerwindow):
                 "head": canvas.create_oval(320, 320, 380, 380, fill="black") ,
                 "body": canvas.create_rectangle(340, 380, 360, 470, fill="white")
         }
+
+        def move(event):
+                y = 0
+                x = 0
+                if event.keysym.lower() == "w":
+                        y = -SPEED
+
+                if event.keysym.lower() == "s":
+                        y = SPEED
+
+                if event.keysym.lower() == "a":
+                        x = -SPEED
+
+                if event.keysym.lower() == "d":
+                        x = SPEED
+
+                for i in player.values():
+                        canvas.move(i,x,y)
+
+        gameplay.bind("<KeyPress>",move)
+
 
         inv_btn = Button(gameplay,command=lambda:[inventory(gameplay),gameplay.withdraw()], text="Inventory")
         inv_btn.place(x=0,y=0)
