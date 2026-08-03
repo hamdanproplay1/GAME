@@ -1,21 +1,17 @@
 from tkinter import *
 from inv import inventory
 import config
+from Shop import shop
 
-def play():#playerwindow):
-        #gameplay = Toplevel(playerwindow)
-        gameplay = Tk()
+def play(playerwindow):
+        gameplay = Toplevel(playerwindow)
         gameplay.title("Play")
         gameplay.geometry("1000x600")
-        gameplay.resizable(False,False)
         gameplay.attributes("-fullscreen",config.FULLSCREEN)
         canvas = Canvas(gameplay,width=2300,height=1300,bg="#15E058")
         canvas.pack()
-        SPEED = 10
+        SPEED = 35
         
-        # house 
-        # canvas.create_rectangle(1500,445,1766,265,fill="#493333") #width = 533 height = 300
-        # canvas.create_polygon(1500,455,2033,445,1283,545,fill="#493333") #
 
         screen_width = 2560
         screen_height = 1440
@@ -57,6 +53,24 @@ def play():#playerwindow):
                 "head": canvas.create_oval(320, 320, 380, 380, fill="black") ,
                 "body": canvas.create_rectangle(340, 380, 360, 470, fill="white")
         }
+        
+        shop_prompt = canvas.create_text(house_x + house_width // 2,house_y - 35,text="Press E to open the shop",font=("Arial", 20),fill="lightblue", state="hidden")
+        def colision(box1,box2):
+                left1, top1, right1, bottom1 = box1
+                left2, top2, right2, bottom2 = box2
+
+                if right1 < left2:
+                        return False
+                
+                if left1 > right2:
+                        return False
+                
+                if bottom1 < top2:
+                        return False
+                
+                if top1 > bottom2:
+                        return False
+                return True
 
         def move(event):
                 y = 0
@@ -73,17 +87,44 @@ def play():#playerwindow):
                 if event.keysym.lower() == "d":
                         x = SPEED
 
+                
+                player_box = canvas.bbox(player["body"])
+                new_box = (player_box[0]+x,player_box[1]+y,player_box[2]+x,player_box[3]+y)
+
+                if colision(new_box,canvas.bbox(tree1["trunk1"])):
+                        return
+                if colision(new_box,canvas.bbox(tree1["leaves1"])):
+                        return
+                
+                if colision(new_box,canvas.bbox(tree2["trunk"])):
+                        return
+                
+                if colision(new_box,canvas.bbox(tree2["leaves"])):
+                        return
+                
+                if colision(new_box,canvas.bbox(house["roof"])):
+                        return
+                
+                if colision(player_box,canvas.bbox(house["door"])):
+                        canvas.itemconfig(shop_prompt,state="normal")
+                        if event.keysym.lower() == "e":   
+                                print(event.keysym)
+                                gameplay.withdraw()
+                                shop(gameplay)        
+                                
+                else:
+                        canvas.itemconfig(shop_prompt,state="hidden")
+
                 for i in player.values():
                         canvas.move(i,x,y)
 
         gameplay.bind("<KeyPress>",move)
-
+        
 
         inv_btn = Button(gameplay,command=lambda:[inventory(gameplay),gameplay.withdraw()], text="Inventory")
         inv_btn.place(x=0,y=0)
 
-        back_btn = Button(gameplay,command=lambda:[gameplay.destroy(),])#text="Back",playerwindow.deiconify()])
+        back_btn = Button(gameplay,command=lambda:[gameplay.destroy(),playerwindow.deiconify()],text="back")
         back_btn.pack()
 
 
-play()

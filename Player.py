@@ -18,7 +18,7 @@ def player(window):
     rightframe = Frame(mainframe)
     rightframe.pack(side="right",fill="both",expand=True,padx=20,pady=20)
 
-    file_name = "player.png"
+    file_name = "images/player.png"
     
     def get_values():
         
